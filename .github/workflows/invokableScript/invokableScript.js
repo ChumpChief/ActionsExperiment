@@ -3,32 +3,41 @@ module.exports = async ({github, context, core, exec}) => {
         throw new Error("Expected a branch!");
     }
     const baseBranchName = context.ref.replace("refs/heads/", "");
-    if (baseBranchName.includes("-bump")) {
-        throw new Error("Can't bump a bump branch!");
+    const bumpBranchName = `bump/${ baseBranchName }`;
+
+    const { data: existingPullRequests } = await github.rest.pulls.list({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        state: "open",
+        head: bumpBranchName,
+        base: baseBranchName,
+    });
+    if (existingPullRequests.length > 0) {
+        throw new Error(`Bump PR #${ existingPullRequests[0].number } is already open for branch ${ baseBranchName }, close it and try again.`);
     }
-    const bumpBranchName = `${ baseBranchName }-bump`;
 
     const branchExists = (await exec.exec("git",  ["show-ref", "--quiet", `refs/heads/${ bumpBranchName }`], { ignoreReturnCode: true })) === 0;
-    if (!branchExists) {
+    if (branchExists) {
+        // Check out the existing bump branch and reset it to the latest head
+        await exec.exec(`git checkout ${ bumpBranchName }`);
+        await exec.exec(`git reset --hard ${ context.sha }`);
+    } else {
         // Create the branch and check it out
         await exec.exec(`git checkout -b ${ bumpBranchName }`);
-    } else {
-        // Just check it out?  Reset?  Delete it?
     }
 
     // Run version bumping command
     const currentTimestamp = Date.now();
-    await exec.exec(`touch ${ currentTimestamp }.txt`);
     await exec.exec(`echo ${ currentTimestamp } > ${ currentTimestamp }.txt`);
 
     // Commmit changes
     await exec.exec(`git add .`);
     await exec.exec(`git config --global user.name "github-actions[bot]"`);
     await exec.exec(`git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"`);
-    await exec.exec(`git commit -m "Version bump"`);
+    await exec.exec(`git commit -m "Version bump on ${ baseBranchName }"`);
 
-    // Push the branch
-    await exec.exec(`git push origin ${ bumpBranchName }`);
+    // Push the branch.  Force in case we're updating the existing branch.
+    await exec.exec(`git push origin -f ${ bumpBranchName }`);
 
     // Create a PR
     const { data: newPullRequest } = await github.rest.pulls.create({
@@ -36,7 +45,7 @@ module.exports = async ({github, context, core, exec}) => {
         repo: context.repo.repo,
         head: bumpBranchName,
         base: baseBranchName,
-        title: "Version bump",
+        title: `Version bump on ${ baseBranchName }`,
         draft: true,
     });
 
