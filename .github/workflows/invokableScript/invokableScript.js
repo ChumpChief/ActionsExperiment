@@ -5,7 +5,7 @@ module.exports = async ({github, context, core, exec}) => {
     }
     const bumpBranchName = `${ baseBranchName }-bump`;
 
-    const branchExists = (await exec.exec(`git show-ref --quiet refs/heads/${ bumpBranchName }`)) === 0;
+    const branchExists = (await exec.exec("git",  ["show-ref", "--quiet", `refs/heads/${ bumpBranchName }`], { ignoreReturnCode: true })) === 0;
     if (!branchExists) {
         // Create the branch and check it out
         await exec.exec(`git checkout -b ${ bumpBranchName }`);
