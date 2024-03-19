@@ -2,6 +2,9 @@
 
 name: Invoke a script
 
+permissions:
+  contents: write
+
 # Controls when the workflow will run
 on:
   # Allows you to run this workflow manually from the Actions tab
