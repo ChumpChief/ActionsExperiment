@@ -1,6 +1,6 @@
 module.exports = async ({github, context, core, exec}) => {
     // const baseBranchName = context.ref.replace("refs/heads/", "");
-    // Temporary for testing
+    // TODO: Temporary for testing
     const baseBranchName = context.ref.replace("refs/pull/9/", "");
     if (baseBranchName.includes("-bump")) {
         throw new Error("Can't bump a bump branch!");
@@ -32,7 +32,9 @@ module.exports = async ({github, context, core, exec}) => {
         owner: context.repo.owner,
         repo: context.repo.repo,
         head: bumpBranchName,
-        base: baseBranchName,
+        // base: baseBranchName,
+        // TODO: Temporary for testing
+        base: "main",
         title: "Version bump",
     });
 
