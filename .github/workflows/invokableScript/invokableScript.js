@@ -17,7 +17,9 @@ module.exports = async ({github, context, core, exec}) => {
     }
 
     // Run version bumping command
-    await exec.exec(`touch ${ Date.now() }.txt`);
+    const currentTimestamp = Date.now();
+    await exec.exec(`touch ${ currentTimestamp }.txt`);
+    await exec.exec(`echo ${ currentTimestamp } > ${ currentTimestamp }.txt`);
 
     // Commmit changes
     await exec.exec(`git add .`);
@@ -35,6 +37,7 @@ module.exports = async ({github, context, core, exec}) => {
         head: bumpBranchName,
         base: baseBranchName,
         title: "Version bump",
+        draft: true,
     });
 
     console.log(`Opened PR #${newPullRequest.number}`);
