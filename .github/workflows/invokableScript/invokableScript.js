@@ -28,7 +28,7 @@ module.exports = async ({github, context, core, exec}) => {
     await exec.exec(`git push origin ${ bumpBranchName }`);
 
     // Create a PR
-    const { data: newPullRequest } = await octokit.rest.pulls.create({
+    const { data: newPullRequest } = await github.rest.pulls.create({
         owner: context.repo.owner,
         repo: context.repo.repo,
         head: bumpBranchName,
