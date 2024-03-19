@@ -35,6 +35,7 @@ module.exports = async ({github, context, core, exec}) => {
         head: bumpBranchName,
         base: baseBranchName,
         title: "Version bump",
+        draft: true,
     });
 
     console.log(`Opened PR #${newPullRequest.number}`);
