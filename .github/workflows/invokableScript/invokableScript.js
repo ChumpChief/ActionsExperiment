@@ -18,6 +18,8 @@ module.exports = async ({github, context, core, exec}) => {
 
     // Commmit changes
     await exec.exec(`git add .`);
+    await exec.exec(`git config --global user.name "github-actions[bot]"`);
+    await exec.exec(`git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"`);
     await exec.exec(`git commit -m "Version bump"`);
 
     // Push the branch
