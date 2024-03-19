@@ -5,23 +5,23 @@ module.exports = async ({github, context, core, exec}) => {
     }
     const bumpBranchName = `${ baseBranchName }-bump`;
 
-    const branchExists = (await exec(`git show-ref --quiet refs/heads/${ bumpBranchName }`)) === 0;
+    const branchExists = (await exec.exec(`git show-ref --quiet refs/heads/${ bumpBranchName }`)) === 0;
     if (!branchExists) {
         // Create the branch and check it out
-        await exec(`git checkout -b ${ bumpBranchName }`);
+        await exec.exec(`git checkout -b ${ bumpBranchName }`);
     } else {
         // Just check it out?  Reset?  Delete it?
     }
 
     // Run version bumping command
-    await exec(`touch ${ Date.now() }.txt`);
+    await exec.exec(`touch ${ Date.now() }.txt`);
 
     // Commmit changes
-    await exec(`git add .`);
-    await exec(`git commit -m "Version bump"`);
+    await exec.exec(`git add .`);
+    await exec.exec(`git commit -m "Version bump"`);
 
     // Push the branch
-    await exec(`git push origin ${ bumpBranchName }`);
+    await exec.exec(`git push origin ${ bumpBranchName }`);
 
     // Create a PR
     const { data: newPullRequest } = await octokit.rest.pulls.create({
