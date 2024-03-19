@@ -1,4 +1,40 @@
-module.exports = async ({github, context, core}) => {
+module.exports = async ({github, context, core, exec}) => {
+    const baseBranchName = context.ref.replace("refs/heads/", "");
+    if (baseBranchName.includes("-bump")) {
+        throw new Error("Can't bump a bump branch!");
+    }
+    const bumpBranchName = `${ baseBranchName }-bump`;
+
+    const branchExists = (await exec(`git show-ref --quiet refs/heads/${ bumpBranchName }`)) === 0;
+    if (!branchExists) {
+        // Create the branch and check it out
+        await exec(`git checkout -b ${ bumpBranchName }`);
+    } else {
+        // Just check it out?  Reset?  Delete it?
+    }
+
+    // Run version bumping command
+    await exec(`touch ${ Date.now() }.txt`);
+
+    // Commmit changes
+    await exec(`git add .`);
+    await exec(`git commit -m "Version bump"`);
+
+    // Push the branch
+    await exec(`git push origin ${ bumpBranchName }`);
+
+    // Create a PR
+    const { data: newPullRequest } = await octokit.rest.pulls.create({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        head: bumpBranchName,
+        base: baseBranchName,
+        title: "Version bump",
+    });
+
+    console.log(`Opened PR #${newPullRequest.number}`);
+
+    // Wait for the PR to be merged (maybe a separate step/script)
     console.log(`${new Date().toLocaleString()}: taking a break...`);
     return new Promise((resolve) => {
         setTimeout(() => {
