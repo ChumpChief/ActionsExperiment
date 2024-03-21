@@ -36,7 +36,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const script = require(".github/workflows/scripts/release.js");
+            const script = require(".github/workflows/scripts/release.cjs");
             await script({github, context, core, exec});
 
   unlock-branch:
