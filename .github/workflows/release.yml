@@ -30,7 +30,7 @@ jobs:
           script: |
             const branchName = context.ref.replace("refs/heads/", "");
             console.log(`Locking branch ${ branchName }...`);
-            const { data: lockRuleset } = await github.rest.repos.createRepoRuleset({ repo: context.repo.repo, owner: context.repo.owner, name: "Lock ${{ context.ref.replace("refs/heads/", "") }} for bump" });
+            const { data: lockRuleset } = await github.rest.repos.createRepoRuleset({ repo: context.repo.repo, owner: context.repo.owner, name: `Lock ${ branchName } for bump` });
             console.log(`Locked the branch.  Ruleset ID: ${ lockRuleset.id }`);
             return lockRuleset.id;
 
