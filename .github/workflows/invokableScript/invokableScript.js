@@ -28,7 +28,7 @@ module.exports = async ({github, context, core, exec}) => {
 
     // Run version bumping command
     const currentTimestamp = Date.now();
-    await exec.exec(`touch ${ currentTimestamp }.txt && echo ${ currentTimestamp } > ${ currentTimestamp }.txt`);
+    await exec.exec(`touch ${ currentTimestamp }.txt`);
 
     // Commmit changes
     await exec.exec(`git add .`);

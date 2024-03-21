@@ -1,0 +1,25 @@
+{
+    "name": "actions-experiment",
+    "private": true,
+    "description": "Experimenting with Github Actions",
+    "scripts": {
+        "build": "nx run-many --target=build",
+        "clean": "nx run-many --target=clean",
+        "lint": "nx run-many --target=lint",
+        "nx": "nx",
+        "reset": "nx reset",
+        "start": "nx run examples:start",
+        "test": "nx run-many --target=test",
+        "webpack": "nx run-many --target=webpack",
+        "ci": "nx run-many --targets=build,lint,test,webpack",
+        "release": "pnpm run build && changeset publish"
+    },
+    "keywords": [],
+    "author": "Matt Rakow",
+    "license": "Unlicense",
+    "type": "module",
+    "devDependencies": {
+        "@changesets/cli": "^2.27.1",
+        "nx": "^18.0.8"
+    }
+}
