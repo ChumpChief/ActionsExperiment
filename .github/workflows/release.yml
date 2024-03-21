@@ -15,7 +15,7 @@ on:
         default: true
 
 jobs:
-  lock-branch:
+  lock_branch:
     name: Lock the branch
     runs-on: ubuntu-latest
     steps:
@@ -25,11 +25,13 @@ jobs:
           # Pass rule id through as an output so it can be deleted at the end
           script: |
             console.log("Locking the branch...");
+            const { data: lockRuleset } = await github.rest.repos.createRepoRuleset({ repo: context.repo.repo, owner: context.repo.owner, name: "Lock ${{ context.ref.replace("refs/heads/", "") }} for bump" });
+            echo "lockRulesetId=${{ lockRuleset.id }}" >> $GITHUB_OUTPUT
 
   release:
     name: Release a new version
     runs-on: ubuntu-latest
-    needs: [lock-branch]
+    needs: [lock_branch]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,13 +41,14 @@ jobs:
             const script = require(".github/workflows/scripts/release.cjs");
             await script({github, context, core, exec});
 
-  unlock-branch:
+  unlock_branch:
     name: Unlock the branch
     runs-on: ubuntu-latest
-    needs: [lock-branch, release]
+    needs: [lock_branch, release]
     steps:
       - uses: actions/github-script@v7
         with:
           # Here delete branch lock rule
           script: |
             console.log("Unlocking the branch...");
+            console.log("Deleting ${{ needs.lock_branch.outputs.lockRulesetId }}...");
