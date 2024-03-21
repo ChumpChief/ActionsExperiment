@@ -7,6 +7,12 @@ permissions:
 on:
   # Only runs on demand
   workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Dry run"
+        required: true
+        type: boolean
+        default: true
 
 jobs:
   lock-branch:
@@ -40,7 +46,6 @@ jobs:
     steps:
       - uses: actions/github-script@v7
         with:
-          # Here create branch lock rule
-          # Pass rule id through as an output so it can be deleted at the end
+          # Here delete branch lock rule
           script: |
             console.log("Unlocking the branch...");
